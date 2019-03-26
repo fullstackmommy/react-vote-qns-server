@@ -11,7 +11,14 @@ router
     })
     .post(async(req, res) => {
         try {
-            const newEvent = await Event.create({name: req.body.name, speaker: req.body.speaker, startDate: req.body.startDate, endDate: req.body.endDate, venue: req.body.venue})
+            const newEvent = await Event.create({
+                name: req.body.name,
+                organizer: req.body.organizer,
+                speaker: req.body.speaker,
+                startDate: req.body.startDate,
+                endDate: req.body.endDate,
+                venue: req.body.venue
+            })
             res
                 .status(201)
                 .json(newEvent)
@@ -33,7 +40,14 @@ router
                 include: [Question]
             })
 
-            await event.update({name: req.body.name, speaker: req.body.speaker, startDate: req.body.startDate, endDate: req.body.endDate, venue: releaseEvents.venue})
+            await event.update({
+                name: req.body.name,
+                organizer: req.body.organizer,
+                speaker: req.body.speaker,
+                startDate: req.body.startDate,
+                endDate: req.body.endDate,
+                venue: req.body.venue
+            })
 
             return res
                 .status(202)

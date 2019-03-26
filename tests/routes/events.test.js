@@ -23,6 +23,7 @@ describe('Events', () => {
             const events = res.body
             events.forEach((event, index) => {
                 expect(event.name).toEqual(expected[index].name)
+                expect(event.organizer).toEqual(expected[index].organizer)
                 expect(event.speaker).toEqual(expected[index].speaker)
                 expect(event.startDate).toEqual(expected[index].startDate)
                 expect(event.endDate).toEqual(expected[index].endDate)
@@ -35,6 +36,7 @@ describe('Events', () => {
                 {
                     id: 1,
                     name: "SJADES 2018 Scientific Talk",
+                    organizer: "Lee Kong Chian Natural History Museum",
                     speaker: "Iffah Binte Iesa",
                     startDate: "16 Mar 2019",
                     endDate: "16 Mar 2019",
@@ -57,6 +59,7 @@ describe('Events', () => {
                 }, {
                     id: 2,
                     name: "Translocation and inspiration: Javanese Batik in Europe and Africa",
+                    organizer: "The Peranakan Museum Singapore",
                     speaker: "Dr Maria Wronska-Friend",
                     startDate: "2 Mar 2019",
                     endDate: "2 Mar 2019",
@@ -68,6 +71,7 @@ describe('Events', () => {
                 }, {
                     id: 3,
                     name: "Ikebana",
+                    organizer: "Yamano Florist & Ikebana School",
                     speaker: "Kazumi Ishikawa",
                     startDate: "21 Mar 2019",
                     endDate: "21 Mar 2019",
@@ -94,11 +98,19 @@ describe('Events', () => {
         test('Creates a new event', () => {
             return request(app)
                 .post(route())
-                .send({name: "My Heart Medications and I", speaker: "Rachel Tan", startDate: "12 Apr 2019", endDate: "12 Apr 2019", venue: "Singapore Heart Foundation Heart Wellness Centre"})
+                .send({
+                    name: "My Heart Medications and I",
+                    organizer: "Singapore Heart Foundation",
+                    speaker: "Rachel Tan",
+                    startDate: "12 Apr 2019",
+                    endDate: "12 Apr 2019",
+                    venue: "Singapore Heart Foundation Heart Wellness Centre"
+                })
                 .expect(201)
                 .then(res => {
                     const event = res.body
                     expect(event.name).toEqual("My Heart Medications and I")
+                    expect(event.organizer).toEqual("Singapore Heart Foundation")
                     expect(event.speaker).toEqual("Rachel Tan")
                     expect(event.startDate).toEqual("12 Apr 2019")
                     expect(event.endDate).toEqual("12 Apr 2019")
@@ -111,13 +123,14 @@ describe('Events', () => {
             const id = "3"
             return request(app)
                 .put(route(id))
-                .send({id: 2, name: "Ikebana 101"})
+                .send({id: 2, name: "Ikebana 101", speaker: "Megumi Ishikawa"})
                 .expect(202)
                 .then(res => {
                     const event = res.body
                     expect(event.id).toEqual(3)
                     expect(event.name).toEqual("Ikebana 101")
-                    expect(event.speaker).toEqual("Kazumi Ishikawa")
+                    expect(event.organizer).toEqual("Yamano Florist & Ikebana School")
+                    expect(event.speaker).toEqual("Megumi Ishikawa")
                     expect(event.startDate).toEqual("21 Mar 2019")
                     expect(event.endDate).toEqual("21 Mar 2019")
                     expect(event.venue).toEqual("Shangri-la Hotel Singapore")
