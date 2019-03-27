@@ -31,6 +31,16 @@ router
 
 router
     .route("/:id")
+    .get(async(req, res) => {
+        const events = await Event.findOne({
+            where: {
+                id: req.params.id
+            },
+            include: [Question]
+        })
+
+        res.json(events)
+    })
     .put(async(req, res) => {
         try {
             const event = await Event.findOne({

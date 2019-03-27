@@ -81,7 +81,30 @@ describe('Questions', () => {
                 .expect(200)
                 .expect(res => verifyQuestions(res, expectedQuestions))
         });
-        test('Get the questions based on event ID', () => {});
+        test('Get the questions based on event ID', () => {
+            const id = "1"
+            const expectedQuestions = [
+                {
+                    id: 1,
+                    description: "How did you select the specimens?",
+                    vote: 5,
+                    event: {
+                        name: "SJADES 2018 Scientific Talk"
+                    }
+                }
+            ]
+            return request(app)
+                .get(route(id))
+                .expect("content-type", /json/)
+                .expect(200)
+                .then(res => {
+                    const question = res.body
+                    expect(question.description).toEqual("How did you select the specimens?")
+                    expect(question.vote).toBe(5)
+                    expect(question.event.name).toEqual("SJADES 2018 Scientific Talk")
+                })
+        });
+
         test('Get the questions matching the query keywords - no match found', () => {});
         test('Get the questions matching the query keywords', () => {});
     })
@@ -101,11 +124,11 @@ describe('Questions', () => {
     })
 
     describe('[PUT] Edits a question', () => {
-        test('Update a question', () => {
+        test('Update a question description', () => {
             const id = "2"
             return request(app)
                 .put(route(id))
-                .send({id: 2, description: "How did you prepare the specimens onboard?", event: "SJADES 2018 Scientific Talk"})
+                .send({id: 2, description: "How did you prepare the specimens onboard?"})
                 .expect(202)
                 .then(res => {
                     const question = res.body
@@ -114,6 +137,21 @@ describe('Questions', () => {
                     expect(question.event.name).toEqual("SJADES 2018 Scientific Talk")
                 })
         })
+
+        test('Update a question - votes', () => {
+            const id = "2"
+            return request(app)
+                .put(route(id))
+                .send({id: 2, vote: 100})
+                .expect(202)
+                .then(res => {
+                    const question = res.body
+                    expect(question.id).toEqual(2)
+                    expect(question.vote).toEqual(100)
+                    expect(question.event.name).toEqual("SJADES 2018 Scientific Talk")
+                })
+        })
+
         test('Update a question, record not found', (done) => {
             const id = "1000"
             return request(app)

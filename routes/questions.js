@@ -42,6 +42,15 @@ router
 
 router
   .route("/:id")
+  .get(async(req, res) => {
+    const questions = await Question.findOne({
+      where: {
+        id: req.params.id
+      },
+      include: [Event]
+    })
+    res.json(questions)
+  })
   .put(async(req, res) => {
     try {
       const question = await Question.findOne({
@@ -51,24 +60,11 @@ router
         include: [Event]
       })
 
-      const [foundEvent] = await Event.findOrCreate({
-        where: {
-          name: req.body.event
-        }
-      })
+      await question.update({description: req.body.description, vote: req.body.vote})
 
-      await question.update({description: req.body.description})
-      await question.setEvent(foundEvent)
-
-      const result = await Question.findOne({
-        where: {
-          id: question.id
-        },
-        include: [Event]
-      })
       return res
         .status(202)
-        .json(result)
+        .json(question)
     } catch (e) {
       res.sendStatus(400)
     }

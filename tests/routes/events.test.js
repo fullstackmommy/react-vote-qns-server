@@ -90,7 +90,49 @@ describe('Events', () => {
                 .expect(res => verifyEvents(res, expectedEvents))
         })
 
-        test('Returns matching event based on event ID', () => {})
+        test('Returns matching event based on event ID', () => {
+            const id = "1"
+            const expectedEvents = [
+                {
+                    id: 1,
+                    name: "SJADES 2018 Scientific Talk",
+                    organizer: "Lee Kong Chian Natural History Museum",
+                    speaker: "Iffah Binte Iesa",
+                    startDate: "16 Mar 2019",
+                    endDate: "16 Mar 2019",
+                    venue: "Lee Kong Chian Natural History Museum",
+                    questions: [
+                        {
+                            description: "How did you select the specimens?",
+                            vote: 5
+                        }, {
+                            description: "How did you prepare the specimens?",
+                            vote: 10
+                        }, {
+                            description: "Why the specimens don't turn mouldy over time?",
+                            vote: 20
+                        }, {
+                            description: "How did you handle the garbage collected in the trawlers?",
+                            vote: 25
+                        }
+                    ]
+                }
+            ]
+            return request(app)
+                .get(route(id))
+                .expect("content-type", /json/)
+                .expect(200)
+                .then(res => {
+                    const event = res.body
+                    expect(event.name).toEqual("SJADES 2018 Scientific Talk")
+                    expect(event.organizer).toEqual("Lee Kong Chian Natural History Museum")
+                    expect(event.speaker).toEqual("Iffah Binte Iesa")
+                    expect(event.startDate).toEqual("16 Mar 2019")
+                    expect(event.endDate).toEqual("16 Mar 2019")
+                    expect(event.venue).toEqual("Lee Kong Chian Natural History Museum")
+                    expect(event.questions.length).toBe(4)
+                })
+        })
         test('Returns matching event based on event ID - no record found', () => {})
     })
 
