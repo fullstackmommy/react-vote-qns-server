@@ -5,7 +5,12 @@ const {Event, Question, sequelize} = require('../models')
 router
   .route("/")
   .get(async(req, res) => {
-    const questions = await Question.findAll({include: [Event]})
+    const questions = await Question.findAll({
+      where: {
+        eventId: req.body.id
+      },
+      include: [Event]
+    })
     res.json(questions)
   })
   .post(async(req, res) => {

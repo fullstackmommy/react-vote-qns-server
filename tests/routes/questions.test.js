@@ -17,7 +17,7 @@ afterAll(async() => {
     await sequelize.close()
 })
 
-describe('Questions', () => {
+xdescribe('Questions', () => {
     describe('[GET]', () => {
         const verifyQuestions = (res, expected) => {
             const questions = res.body
@@ -81,7 +81,7 @@ describe('Questions', () => {
                 .expect(200)
                 .expect(res => verifyQuestions(res, expectedQuestions))
         });
-        test('Get the questions based on event ID', () => {
+        test('Get the questions based on question ID', () => {
             const id = "1"
             const expectedQuestions = [
                 {

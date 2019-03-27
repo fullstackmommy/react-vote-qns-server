@@ -8,6 +8,11 @@ const route = (params = "") => {
     return `${path}/${params}`;
 };
 
+const questionRoute = (eventId, params = "") => {
+    const path = `/api/v1/events/${eventId}/questions`;
+    return `${path}/${params}`;
+}
+
 beforeAll(async() => {
     await sequelize.sync({force: true})
     await createEventsAndQuestions()
@@ -197,6 +202,225 @@ describe('Events', () => {
             const id = "1000"
             request(app)
                 .delete(route(id))
+                .expect(400, done)
+        })
+    })
+})
+
+describe('Questions', () => {
+    describe('[GET]', () => {
+        const verifyQuestions = (res, expected) => {
+            const questions = res.body
+            questions.forEach((question, index) => {
+                expect(question.description).toEqual(expected[index].description)
+                expect(question.vote).toEqual(expected[index].vote)
+                expect(question.eventId).toEqual(expected[index].eventId)
+                expect(question.event.name).toEqual(expected[index].event.name)
+            })
+        }
+
+        test('Returns all questions in an event', () => {
+            const id = "1"
+            const expectedQuestions = [
+                {
+                    id: 1,
+                    description: "How did you select the specimens?",
+                    answer: null,
+                    vote: 5,
+                    eventId: 1,
+                    event: {
+                        id: 1,
+                        name: "SJADES 2018 Scientific Talk",
+                        organizer: "Lee Kong Chian Natural History Museum",
+                        speaker: "Iffah Binte Iesa",
+                        startDate: "16 Mar 2019",
+                        endDate: "16 Mar 2019",
+                        venue: "Lee Kong Chian Natural History Museum"
+                    }
+                }, {
+                    id: 2,
+                    description: "How did you prepare the specimens?",
+                    answer: null,
+                    vote: 10,
+                    eventId: 1,
+                    event: {
+                        id: 1,
+                        name: "SJADES 2018 Scientific Talk",
+                        organizer: "Lee Kong Chian Natural History Museum",
+                        speaker: "Iffah Binte Iesa",
+                        startDate: "16 Mar 2019",
+                        endDate: "16 Mar 2019",
+                        venue: "Lee Kong Chian Natural History Museum"
+                    }
+                }, {
+                    id: 3,
+                    description: "Why the specimens don't turn mouldy over time?",
+                    answer: null,
+                    vote: 20,
+                    eventId: 1,
+                    event: {
+                        id: 1,
+                        name: "SJADES 2018 Scientific Talk",
+                        organizer: "Lee Kong Chian Natural History Museum",
+                        speaker: "Iffah Binte Iesa",
+                        startDate: "16 Mar 2019",
+                        endDate: "16 Mar 2019",
+                        venue: "Lee Kong Chian Natural History Museum"
+                    }
+                }, {
+                    id: 4,
+                    description: "How did you handle the garbage collected in the trawlers?",
+                    answer: null,
+                    vote: 25,
+                    eventId: 1,
+                    event: {
+                        id: 1,
+                        name: "SJADES 2018 Scientific Talk",
+                        organizer: "Lee Kong Chian Natural History Museum",
+                        speaker: "Iffah Binte Iesa",
+                        startDate: "16 Mar 2019",
+                        endDate: "16 Mar 2019",
+                        venue: "Lee Kong Chian Natural History Museum"
+                    }
+                }
+            ]
+            return request(app)
+                .get(questionRoute(id, ''))
+                .expect("content-type", /json/)
+                .expect(200)
+                .expect(res => verifyQuestions(res, expectedQuestions))
+        })
+
+        test('No question returned when event ID is invalid', () => {
+            const id = "100"
+            return request(app)
+                .get(questionRoute(id, ''))
+                .expect("content-type", /json/)
+                .expect(200)
+                .then(res => {
+                    const event = res.body
+                    expect(event).toHaveLength(0)
+                })
+        })
+
+        test('Get the question based on question ID', () => {
+            const id = "1"
+            const questionId = "1"
+            const expectedQuestions = [
+                {
+                    id: 1,
+                    description: "How did you select the specimens?",
+                    answer: null,
+                    vote: 5,
+                    eventId: 1,
+                    event: {
+                        id: 1,
+                        name: "SJADES 2018 Scientific Talk",
+                        organizer: "Lee Kong Chian Natural History Museum",
+                        speaker: "Iffah Binte Iesa",
+                        startDate: "16 Mar 2019",
+                        endDate: "16 Mar 2019",
+                        venue: "Lee Kong Chian Natural History Museum"
+                    }
+                }
+            ]
+
+            return request(app)
+                .get(questionRoute(id, questionId))
+                .expect("content-type", /json/)
+                .expect(200)
+                .then(res => {
+                    const question = res.body
+                    expect(question.description).toEqual("How did you select the specimens?")
+                    expect(question.vote).toBe(5)
+                    expect(question.event.name).toEqual("SJADES 2018 Scientific Talk")
+                })
+        })
+
+        test('Get the question based on question ID: no record found', () => {
+            const id = "1"
+            const questionId = "100"
+            return request(app)
+                .get(questionRoute(id, questionId))
+                .expect("content-type", /json/)
+                .expect(200)
+                .then(res => {
+                    const question = res.body
+                    expect(question).toBeNull()
+                })
+        })
+    })
+
+    describe('[POST]', () => {
+        test('Creates a new question', () => {
+            const id = "1"
+            return request(app)
+                .post(questionRoute(id, ''))
+                .send({description: "How to keep the specimens while onboard?", eventId: id})
+                .expect(201)
+                .then(res => {
+                    const question = res.body
+                    expect(question.description).toEqual("How to keep the specimens while onboard?")
+                    expect(question.event.name).toEqual("SJADES 2018 Scientific Talk")
+                });
+        })
+    })
+
+    describe('[PUT]', () => {
+        test('Updates a question description based on question ID', () => {
+            const id = "1"
+            const qid = "2"
+            return request(app)
+                .put(questionRoute(id, qid))
+                .send({description: "How did you prepare the specimens onboard?"})
+                .expect(202)
+                .then(res => {
+                    const question = res.body
+                    expect(question.id).toEqual(2)
+                    expect(question.description).toEqual("How did you prepare the specimens onboard?")
+                    expect(question.event.name).toEqual("SJADES 2018 Scientific Talk")
+                })
+        })
+
+        test('Updates a question - vote based on question ID', () => {
+            const id = "1"
+            const qid = "2"
+            return request(app)
+                .put(questionRoute(id, qid))
+                .send({vote: 100})
+                .expect(202)
+                .then(res => {
+                    const question = res.body
+                    expect(question.id).toEqual(2)
+                    expect(question.description).toEqual("How did you prepare the specimens onboard?")
+                    expect(question.vote).toEqual(100)
+                    expect(question.event.name).toEqual("SJADES 2018 Scientific Talk")
+                })
+        })
+
+        test('Fails to update a question: record not found', (done) => {
+            const id = "1"
+            const qid = "1000"
+            return request(app)
+                .put(questionRoute(id, qid))
+                .send({description: "How did you prepare the specimens onboard?", vote: 100})
+                .expect(400, done)
+        })
+    })
+
+    describe('[DELETE]', () => {
+        test('Deletes a question based on ID', () => {
+            const id = "1"
+            const qid = "1"
+            return request(app)
+                .delete(questionRoute(id, qid))
+                .expect(202)
+        })
+        test('Fails to delete a question- record not found', (done) => {
+            const id = "1"
+            const qid = "1000"
+            request(app)
+                .delete(questionRoute(id, qid))
                 .expect(400, done)
         })
     })
