@@ -2,6 +2,6 @@ deploy:
   provider: heroku
   api_key:
     secure: MeCfxQ3KDkxGE+nP9b7woO7OgyKbDamhIN/FB3GIwJ5zomtRsNgkmiY2liRl49yuTf5lzCw/kS9dYLQhlTfEQmpnC/fFdD+5KjuVk9qqvaErbEYvviekLScs7mpNHeaOa7Y/+Lzwl51/SrepDB5atnriWK1TQblNI0kbP/xdChX0lqnoaxreabXbKPFQ9FwyU/jhGxaVcvaWdjLdM0E4YxK+Jlem1ZB6ZfA5Tixx940me3yCDBsbng4K2TOs9H+vSwFyQHhFpMi3yQ584sbTcFrO2DHJYC018FePvOzvCitbS5mvQIIoG1zEXhq0Ux9TAo5Rs6UH8IgeUR6hLhDEqD64ZmjibEkrLZZFCC00y4lwia6WtajIjUNV/tZjv3Q8ToR4eACCB/73x9zhE0MHaicFAjXGYxCwKnI+8D7/HP9W3qTv6j+EIbQeBhXMPdsbKVbaeUyFv+0tcvAy4t1v5FrQkFnAhdsrKnSVcvoT0MrL8IXFvsl+XeURfRnsVIMmybxCY1jYUDFPy9U7z/a/7M4vY1ca1oYVguF1/1R9hKuD/V9lRd2hbbBOnsCEZjTc4NnOg12AbkGED0iO5Skd2qrM+VUQka9OW7DRwlVfFlCuXXwVVQZSdo11rVvkY5ZGqn8xu7pOGkEaqm7x+Tr+DdY/n5UoIVOC8rzbuyXfIao=
-  app: react-vote-qns-server
+  app: asknow-api
   on:
     repo: fullstackmommy/react-vote-qns-server
