@@ -74,8 +74,10 @@ router
             })
 
             if (event) {
+                res.json({message: 'Deleted'})
                 res.sendStatus(202)
             } else {
+                res.json({message: 'Unable to find the question'})
                 res.sendStatus(400)
             }
         } catch (e) {
