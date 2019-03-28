@@ -3,6 +3,9 @@ const app = require("../../app")
 const {sequelize} = require("../../models")
 const createEventsAndQuestions = require('../../seed')
 
+jest.mock("jsonwebtoken")
+const jwt = require("jsonwebtoken")
+
 const route = (params = "") => {
     const path = "/api/v1/events";
     return `${path}/${params}`;
@@ -24,6 +27,11 @@ afterAll(async() => {
 
 describe('Events', () => {
     describe('[GET]', () => {
+        afterEach(() => {
+            jwt
+                .verify
+                .mockReset()
+        })
         const verifyEvents = (res, expected) => {
             const events = res.body
             events.forEach((event, index) => {
@@ -36,7 +44,31 @@ describe('Events', () => {
             })
         }
 
+        test('Returns all events - deny access when no token is given', (done) => {
+            jwt
+                .verify
+                .mockRejectedValueOnce({})
+
+            return request(app)
+                .get(route())
+                .expect(403, done)
+        })
+
+        test('Returns all events - deny access when token is invalid', (done) => {
+            jwt
+                .verify
+                .mockRejectedValueOnce(new Error('Invalid token given'))
+
+            return request(app)
+                .get(route())
+                .set("Authorization", "Bearer invalid-token")
+                .expect(403, done)
+        })
+
         test('Returns all events', () => {
+            jwt
+                .verify
+                .mockResolvedValueOnce({})
             const expectedEvents = [
                 {
                     id: "SJADES2018",
@@ -90,12 +122,16 @@ describe('Events', () => {
 
             return request(app)
                 .get(route())
+                .set("Authorization", "Bearer my-token")
                 .expect("content-type", /json/)
                 .expect(200)
                 .expect(res => verifyEvents(res, expectedEvents))
         })
 
         test('Returns matching event based on event ID', () => {
+            jwt
+                .verify
+                .mockResolvedValueOnce({})
             const id = "SJADES2018"
             const expectedEvents = [
                 {
@@ -125,6 +161,7 @@ describe('Events', () => {
             ]
             return request(app)
                 .get(route(id))
+                .set("Authorization", "Bearer my-token")
                 .expect("content-type", /json/)
                 .expect(200)
                 .then(res => {
@@ -138,13 +175,33 @@ describe('Events', () => {
                     expect(event.questions.length).toBe(4)
                 })
         })
-        test('Returns matching event based on event ID - no record found', () => {})
+        test('Returns matching event based on event ID - no record found', (done) => {
+            jwt
+                .verify
+                .mockResolvedValueOnce({})
+            const id = "1000"
+
+            return request(app)
+                .get(route(id))
+                .set("Authorization", "Bearer my-token")
+                .expect("content-type", /json/)
+                .expect(400, done)
+        })
     })
 
     describe('[POST]', () => {
+        afterEach(() => {
+            jwt
+                .verify
+                .mockReset()
+        })
         test('Fails to create an event if the event ID is already used', (done) => {
+            jwt
+                .verify
+                .mockResolvedValueOnce({})
             return request(app)
                 .post(route())
+                .set("Authorization", "Bearer my-token")
                 .send({
                     id: "PM032019",
                     name: "My Heart Medications and I",
@@ -157,8 +214,12 @@ describe('Events', () => {
                 .expect(400, done)
         })
         test('Creates a new event', () => {
+            jwt
+                .verify
+                .mockResolvedValueOnce({})
             return request(app)
                 .post(route())
+                .set("Authorization", "Bearer my-token")
                 .send({
                     id: "SHF042019",
                     name: "My Heart Medications and I",
@@ -182,10 +243,19 @@ describe('Events', () => {
         })
     })
     describe('[PUT]', () => {
+        afterEach(() => {
+            jwt
+                .verify
+                .mockReset()
+        })
         test('Updates an event', () => {
+            jwt
+                .verify
+                .mockResolvedValueOnce({})
             const id = "IK032019"
             return request(app)
                 .put(route(id))
+                .set("Authorization", "Bearer my-token")
                 .send({name: "Ikebana 101", speaker: "Megumi Ishikawa"})
                 .expect(202)
                 .then(res => {
@@ -200,24 +270,41 @@ describe('Events', () => {
                 })
         })
         test('Updates an event - record not found', (done) => {
+            jwt
+                .verify
+                .mockResolvedValueOnce({})
             const id = "1000"
             return request(app)
                 .put(route(id))
+                .set("Authorization", "Bearer my-token")
                 .send({id: "1000", name: "Introduction to Bitcoin"})
                 .expect(400, done)
         })
     })
     describe('[DELETE]', () => {
+        afterEach(() => {
+            jwt
+                .verify
+                .mockReset()
+        })
         test('Deletes an event', () => {
+            jwt
+                .verify
+                .mockResolvedValueOnce({})
             const id = "IK032019"
             return request(app)
                 .delete(route(id))
+                .set("Authorization", "Bearer my-token")
                 .expect(202)
         })
         test('Deletes an event - record not found', (done) => {
+            jwt
+                .verify
+                .mockResolvedValueOnce({})
             const id = "1000"
             request(app)
                 .delete(route(id))
+                .set("Authorization", "Bearer my-token")
                 .expect(400, done)
         })
     })
@@ -383,11 +470,20 @@ describe('Questions', () => {
     })
 
     describe('[PUT]', () => {
+        afterEach(() => {
+            jwt
+                .verify
+                .mockReset()
+        })
         test('Updates a question description based on question ID', () => {
+            jwt
+                .verify
+                .mockResolvedValueOnce({})
             const id = "SJADES2018"
             const qid = "2"
             return request(app)
                 .put(questionRoute(id, qid))
+                .set("Authorization", "Bearer my-token")
                 .send({description: "How did you prepare the specimens onboard?"})
                 .expect(202)
                 .then(res => {
@@ -399,10 +495,14 @@ describe('Questions', () => {
         })
 
         test('Updates a question - vote based on question ID', () => {
+            jwt
+                .verify
+                .mockResolvedValueOnce({})
             const id = "SJADES2018"
             const qid = "2"
             return request(app)
                 .put(questionRoute(id, qid))
+                .set("Authorization", "Bearer my-token")
                 .send({vote: 100})
                 .expect(202)
                 .then(res => {
@@ -415,28 +515,45 @@ describe('Questions', () => {
         })
 
         test('Fails to update a question: record not found', (done) => {
+            jwt
+                .verify
+                .mockResolvedValueOnce({})
             const id = "SJADES2018"
             const qid = "1000"
             return request(app)
                 .put(questionRoute(id, qid))
+                .set("Authorization", "Bearer my-token")
                 .send({description: "How did you prepare the specimens onboard?", vote: 100})
                 .expect(400, done)
         })
     })
 
     describe('[DELETE]', () => {
+        afterEach(() => {
+            jwt
+                .verify
+                .mockReset()
+        })
         test('Deletes a question based on ID', () => {
+            jwt
+                .verify
+                .mockResolvedValueOnce({})
             const id = "SJADES2018"
             const qid = "1"
             return request(app)
                 .delete(questionRoute(id, qid))
+                .set("Authorization", "Bearer my-token")
                 .expect(202)
         })
         test('Fails to delete a question- record not found', (done) => {
+            jwt
+                .verify
+                .mockResolvedValueOnce({})
             const id = "SJADES2018"
             const qid = "1000"
             request(app)
                 .delete(questionRoute(id, qid))
+                .set("Authorization", "Bearer my-token")
                 .expect(400, done)
         })
     })

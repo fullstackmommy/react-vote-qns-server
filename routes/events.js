@@ -1,14 +1,35 @@
 const express = require("express")
 const router = express.Router()
+const jwt = require("jsonwebtoken")
+const secret = "SUPER SECRET"
 const {Event, Question, sequelize} = require("../models")
+
+verifyToken = async(req, res, next) => {
+    if (!req.headers.authorization) 
+        return res.sendStatus(403)
+    try {
+        const token = req
+            .headers
+            .authorization
+            .split('Bearer ')[1]
+
+        const payload = await jwt.verify(token, secret)
+        if (payload) 
+            return next()
+    } catch (err) {
+        res
+            .status(403)
+            .send(err.message)
+    }
+}
 
 router
     .route("/")
-    .get(async(req, res) => {
+    .get(verifyToken, async(req, res) => {
         const events = await Event.findAll({include: [Question]})
         res.json(events)
     })
-    .post(async(req, res) => {
+    .post(verifyToken, async(req, res) => {
         try {
             const foundEvent = await Event.findOne({
                 where: {
@@ -18,9 +39,12 @@ router
             if (foundEvent) {
                 res
                     .status(400)
-                    .json("Event ID is already used")
-            }
-            if (!foundEvent) {
+                    .json({
+                        error: {
+                            message: 'Event ID already exists'
+                        }
+                    })
+            } else {
                 const newEvent = await Event.create({
                     id: req.body.id,
                     name: req.body.name,
@@ -34,26 +58,30 @@ router
                     .status(201)
                     .json(newEvent)
             }
-        } catch (e) {
-            res
-                .status(400)
-                .json(err)
+        } catch (err) {
+            res.sendStatus(400)
         }
     })
 
 router
     .route("/:id")
-    .get(async(req, res) => {
-        const events = await Event.findOne({
-            where: {
-                id: req.params.id
-            },
-            include: [Question]
-        })
+    .get(verifyToken, async(req, res) => {
+        try {
+            const events = await Event.findOne({
+                where: {
+                    id: req.params.id
+                },
+                include: [Question]
+            })
+            if (!events) 
+                res.status(400).end
+            res.json(events)
+        } catch (e) {
+            res.sendStatus(400)
+        }
 
-        res.json(events)
     })
-    .put(async(req, res) => {
+    .put(verifyToken, async(req, res) => {
         try {
             const event = await Event.findOne({
                 where: {
@@ -78,7 +106,7 @@ router
             res.sendStatus(400)
         }
     })
-    .delete(async(req, res) => {
+    .delete(verifyToken, async(req, res) => {
         try {
             const event = await Event.destroy({
                 where: {
@@ -154,7 +182,7 @@ router
         })
         res.json(questions)
     })
-    .put(async(req, res) => {
+    .put(verifyToken, async(req, res) => {
         try {
             const question = await Question.findOne({
                 where: {
@@ -172,7 +200,7 @@ router
             res.sendStatus(400)
         }
     })
-    .delete(async(req, res) => {
+    .delete(verifyToken, async(req, res) => {
         try {
             const question = await Question.destroy({
                 where: {

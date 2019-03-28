@@ -2,7 +2,13 @@ module.exports = (sequelize, type) => {
     const Event = sequelize.define('event', {
         id: {
             type: type.STRING,
-            primaryKey: true
+            primaryKey: true,
+            allowNull: false,
+            validate: {
+                notNull: {
+                    msg: 'Please enter event ID'
+                }
+            }
         },
         name: type.STRING,
         organizer: type.STRING,

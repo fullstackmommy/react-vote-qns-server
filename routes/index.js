@@ -1,10 +1,115 @@
 const express = require("express");
 const router = express.Router();
+const bcrypt = require('bcrypt')
+const jwt = require("jsonwebtoken")
+const {User} = require("../models")
+const secret = "SUPER SECRET"
 
 router
     .route("/")
     .get((req, res) => {
         res.sendStatus(200);
     });
+
+router
+    .route('/register')
+    .post(async(req, res) => {
+        try {
+            const foundUser = await User.findOne({
+                where: {
+                    username: req.body.username
+                }
+            })
+            if (foundUser) {
+                res
+                    .status(400)
+                    .json("Username is already used")
+
+            } else {
+                const hashPassword = bcrypt.hashSync(req.body.password, bcrypt.genSaltSync(10))
+                const newUser = await User.create({username: req.body.username, firstName: req.body.firstName, lastName: req.body.lastName, password: hashPassword})
+                res.sendStatus(204)
+            }
+        } catch (err) {
+            res
+                .status(400)
+                .json(err)
+        }
+    })
+
+router
+    .route('/login')
+    .post(async(req, res) => {
+        try {
+            const {username, password} = req.body
+            const user = await User.findOne({username})
+
+            if (!user) {
+                throw new Error('You are not authorized!')
+            }
+
+            const match = await bcrypt.compareSync(password, user.password)
+            if (!match) {
+                throw new Error('You are not authorized!')
+            }
+
+            return res
+                .status(200)
+                .end('You are logged in')
+        } catch (err) {
+            res
+                .status(401)
+                .send(err.message)
+        }
+    })
+
+router
+    .route('/token')
+    .get(async(req, res) => {
+        try {
+            const {username, password} = req.body
+            const user = await User.findOne({username})
+
+            if (!user) {
+                throw new Error('You are not authorized!')
+            }
+
+            const match = await bcrypt.compareSync(password, user.password)
+            if (!match) {
+                throw new Error('You are not authorized!')
+            }
+
+            const userData = {
+                username
+            }
+
+            const expiresIn24hour = {
+                expiresIn: '24h'
+            }
+
+            const token = await jwt.sign(userData, secret, expiresIn24hour)
+
+            return res
+                .status(200)
+                .json({token})
+        } catch (err) {
+            res
+                .status(401)
+                .send(err.message)
+        }
+    })
+    .post(async(req, res) => {
+        if (!req.headers.authorization) {
+            res.sendStatus(401)
+        }
+        const token = req
+            .headers
+            .authorization
+            .split('Bearer ')[1]
+        const userData = await jwt.verify(token, secret)
+        return res
+            .status(200)
+            .json(userData)
+    })
 
 module.exports = router;

@@ -11,7 +11,8 @@ if (env === "production") {
 
 const models = {
     Question: sequelize.import ("./Question"),
-    Event: sequelize.import ("./Event")
+    Event: sequelize.import ("./Event"),
+    User: sequelize.import ("./User")
 }
 
 Object
