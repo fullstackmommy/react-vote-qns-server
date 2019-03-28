@@ -1,9 +1,8 @@
 module.exports = (sequelize, type) => {
     const Event = sequelize.define('event', {
         id: {
-            type: type.INTEGER,
-            primaryKey: true,
-            autoIncrement: true
+            type: type.STRING,
+            primaryKey: true
         },
         name: type.STRING,
         organizer: type.STRING,

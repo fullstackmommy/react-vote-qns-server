@@ -10,17 +10,30 @@ router
     })
     .post(async(req, res) => {
         try {
-            const newEvent = await Event.create({
-                name: req.body.name,
-                organizer: req.body.organizer,
-                speaker: req.body.speaker,
-                startDate: req.body.startDate,
-                endDate: req.body.endDate,
-                venue: req.body.venue
+            const foundEvent = await Event.findOne({
+                where: {
+                    id: req.body.id
+                }
             })
-            res
-                .status(201)
-                .json(newEvent)
+            if (foundEvent) {
+                res
+                    .status(400)
+                    .json("Event ID is already used")
+            }
+            if (!foundEvent) {
+                const newEvent = await Event.create({
+                    id: req.body.id,
+                    name: req.body.name,
+                    organizer: req.body.organizer,
+                    speaker: req.body.speaker,
+                    startDate: req.body.startDate,
+                    endDate: req.body.endDate,
+                    venue: req.body.venue
+                })
+                res
+                    .status(201)
+                    .json(newEvent)
+            }
         } catch (e) {
             res
                 .status(400)
@@ -74,10 +87,8 @@ router
             })
 
             if (event) {
-                res.json({message: 'Deleted'})
                 res.sendStatus(202)
             } else {
-                res.json({message: 'Unable to find the question'})
                 res.sendStatus(400)
             }
         } catch (e) {

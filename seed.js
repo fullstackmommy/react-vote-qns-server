@@ -2,6 +2,7 @@ const {Event, Question} = require('./models')
 
 const createEventsAndQuestions = async() => {
     await Event.create({
+        id: "SJADES2018",
         name: "SJADES 2018 Scientific Talk",
         organizer: "Lee Kong Chian Natural History Museum",
         speaker: "Iffah Binte Iesa",
@@ -25,6 +26,7 @@ const createEventsAndQuestions = async() => {
         ]
     }, {include: [Question]})
     await Event.create({
+        id: "PM032019",
         name: "Translocation and inspiration: Javanese Batik in Europe and Africa",
         organizer: "The Peranakan Museum Singapore",
         speaker: "Dr Maria Wronska-Friend",
@@ -39,6 +41,7 @@ const createEventsAndQuestions = async() => {
         ]
     }, {include: [Question]})
     await Event.create({
+        id: "IK032019",
         name: "Ikebana",
         organizer: "Yamano Florist & Ikebana School",
         speaker: "Kazumi Ishikawa",

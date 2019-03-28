@@ -39,7 +39,7 @@ describe('Events', () => {
         test('Returns all events', () => {
             const expectedEvents = [
                 {
-                    id: 1,
+                    id: "SJADES2018",
                     name: "SJADES 2018 Scientific Talk",
                     organizer: "Lee Kong Chian Natural History Museum",
                     speaker: "Iffah Binte Iesa",
@@ -62,7 +62,7 @@ describe('Events', () => {
                         }
                     ]
                 }, {
-                    id: 2,
+                    id: "PM032019",
                     name: "Translocation and inspiration: Javanese Batik in Europe and Africa",
                     organizer: "The Peranakan Museum Singapore",
                     speaker: "Dr Maria Wronska-Friend",
@@ -74,7 +74,7 @@ describe('Events', () => {
                         vote: 10
                     }
                 }, {
-                    id: 3,
+                    id: "IK032019",
                     name: "Ikebana",
                     organizer: "Yamano Florist & Ikebana School",
                     speaker: "Kazumi Ishikawa",
@@ -96,10 +96,10 @@ describe('Events', () => {
         })
 
         test('Returns matching event based on event ID', () => {
-            const id = "1"
+            const id = "SJADES2018"
             const expectedEvents = [
                 {
-                    id: 1,
+                    id: "SJADES2018",
                     name: "SJADES 2018 Scientific Talk",
                     organizer: "Lee Kong Chian Natural History Museum",
                     speaker: "Iffah Binte Iesa",
@@ -142,10 +142,25 @@ describe('Events', () => {
     })
 
     describe('[POST]', () => {
+        test('Fails to create an event if the event ID is already used', (done) => {
+            return request(app)
+                .post(route())
+                .send({
+                    id: "PM032019",
+                    name: "My Heart Medications and I",
+                    organizer: "Singapore Heart Foundation",
+                    speaker: "Rachel Tan",
+                    startDate: "12 Apr 2019",
+                    endDate: "12 Apr 2019",
+                    venue: "Singapore Heart Foundation Heart Wellness Centre"
+                })
+                .expect(400, done)
+        })
         test('Creates a new event', () => {
             return request(app)
                 .post(route())
                 .send({
+                    id: "SHF042019",
                     name: "My Heart Medications and I",
                     organizer: "Singapore Heart Foundation",
                     speaker: "Rachel Tan",
@@ -156,6 +171,7 @@ describe('Events', () => {
                 .expect(201)
                 .then(res => {
                     const event = res.body
+                    expect(event.id).toEqual("SHF042019")
                     expect(event.name).toEqual("My Heart Medications and I")
                     expect(event.organizer).toEqual("Singapore Heart Foundation")
                     expect(event.speaker).toEqual("Rachel Tan")
@@ -167,14 +183,14 @@ describe('Events', () => {
     })
     describe('[PUT]', () => {
         test('Updates an event', () => {
-            const id = "3"
+            const id = "IK032019"
             return request(app)
                 .put(route(id))
-                .send({id: 2, name: "Ikebana 101", speaker: "Megumi Ishikawa"})
+                .send({name: "Ikebana 101", speaker: "Megumi Ishikawa"})
                 .expect(202)
                 .then(res => {
                     const event = res.body
-                    expect(event.id).toEqual(3)
+                    expect(event.id).toEqual("IK032019")
                     expect(event.name).toEqual("Ikebana 101")
                     expect(event.organizer).toEqual("Yamano Florist & Ikebana School")
                     expect(event.speaker).toEqual("Megumi Ishikawa")
@@ -187,13 +203,13 @@ describe('Events', () => {
             const id = "1000"
             return request(app)
                 .put(route(id))
-                .send({id: 1000, name: "Introduction to Bitcoin"})
+                .send({id: "1000", name: "Introduction to Bitcoin"})
                 .expect(400, done)
         })
     })
     describe('[DELETE]', () => {
         test('Deletes an event', () => {
-            const id = "3"
+            const id = "IK032019"
             return request(app)
                 .delete(route(id))
                 .expect(202)
@@ -220,16 +236,16 @@ describe('Questions', () => {
         }
 
         test('Returns all questions in an event', () => {
-            const id = "1"
+            const id = "SJADES2018"
             const expectedQuestions = [
                 {
                     id: 1,
                     description: "How did you select the specimens?",
                     answer: null,
                     vote: 5,
-                    eventId: 1,
+                    eventId: "SJADES2018",
                     event: {
-                        id: 1,
+                        id: "SJADES2018",
                         name: "SJADES 2018 Scientific Talk",
                         organizer: "Lee Kong Chian Natural History Museum",
                         speaker: "Iffah Binte Iesa",
@@ -242,9 +258,9 @@ describe('Questions', () => {
                     description: "How did you prepare the specimens?",
                     answer: null,
                     vote: 10,
-                    eventId: 1,
+                    eventId: "SJADES2018",
                     event: {
-                        id: 1,
+                        id: "SJADES2018",
                         name: "SJADES 2018 Scientific Talk",
                         organizer: "Lee Kong Chian Natural History Museum",
                         speaker: "Iffah Binte Iesa",
@@ -257,9 +273,9 @@ describe('Questions', () => {
                     description: "Why the specimens don't turn mouldy over time?",
                     answer: null,
                     vote: 20,
-                    eventId: 1,
+                    eventId: "SJADES2018",
                     event: {
-                        id: 1,
+                        id: "SJADES2018",
                         name: "SJADES 2018 Scientific Talk",
                         organizer: "Lee Kong Chian Natural History Museum",
                         speaker: "Iffah Binte Iesa",
@@ -272,7 +288,7 @@ describe('Questions', () => {
                     description: "How did you handle the garbage collected in the trawlers?",
                     answer: null,
                     vote: 25,
-                    eventId: 1,
+                    eventId: "SJADES2018",
                     event: {
                         id: 1,
                         name: "SJADES 2018 Scientific Talk",
@@ -304,7 +320,7 @@ describe('Questions', () => {
         })
 
         test('Get the question based on question ID', () => {
-            const id = "1"
+            const id = "SJADES2018"
             const questionId = "1"
             const expectedQuestions = [
                 {
@@ -312,9 +328,9 @@ describe('Questions', () => {
                     description: "How did you select the specimens?",
                     answer: null,
                     vote: 5,
-                    eventId: 1,
+                    eventId: "SJADES2018",
                     event: {
-                        id: 1,
+                        id: "SJADES2018",
                         name: "SJADES 2018 Scientific Talk",
                         organizer: "Lee Kong Chian Natural History Museum",
                         speaker: "Iffah Binte Iesa",
@@ -338,7 +354,7 @@ describe('Questions', () => {
         })
 
         test('Get the question based on question ID: no record found', () => {
-            const id = "1"
+            const id = "SJADES2018"
             const questionId = "100"
             return request(app)
                 .get(questionRoute(id, questionId))
@@ -353,7 +369,7 @@ describe('Questions', () => {
 
     describe('[POST]', () => {
         test('Creates a new question', () => {
-            const id = "1"
+            const id = "SJADES2018"
             return request(app)
                 .post(questionRoute(id, ''))
                 .send({description: "How to keep the specimens while onboard?", eventId: id})
@@ -368,7 +384,7 @@ describe('Questions', () => {
 
     describe('[PUT]', () => {
         test('Updates a question description based on question ID', () => {
-            const id = "1"
+            const id = "SJADES2018"
             const qid = "2"
             return request(app)
                 .put(questionRoute(id, qid))
@@ -383,7 +399,7 @@ describe('Questions', () => {
         })
 
         test('Updates a question - vote based on question ID', () => {
-            const id = "1"
+            const id = "SJADES2018"
             const qid = "2"
             return request(app)
                 .put(questionRoute(id, qid))
@@ -399,7 +415,7 @@ describe('Questions', () => {
         })
 
         test('Fails to update a question: record not found', (done) => {
-            const id = "1"
+            const id = "SJADES2018"
             const qid = "1000"
             return request(app)
                 .put(questionRoute(id, qid))
@@ -410,14 +426,14 @@ describe('Questions', () => {
 
     describe('[DELETE]', () => {
         test('Deletes a question based on ID', () => {
-            const id = "1"
+            const id = "SJADES2018"
             const qid = "1"
             return request(app)
                 .delete(questionRoute(id, qid))
                 .expect(202)
         })
         test('Fails to delete a question- record not found', (done) => {
-            const id = "1"
+            const id = "SJADES2018"
             const qid = "1000"
             request(app)
                 .delete(questionRoute(id, qid))
