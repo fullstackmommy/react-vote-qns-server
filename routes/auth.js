@@ -69,7 +69,7 @@ router
             if (foundUser) {
                 res
                     .status(400)
-                    .json("Username is already used")
+                    .send({error: "Username is already taken!"})
 
             } else {
                 const hashPassword = bcrypt.hashSync(req.body.password, bcrypt.genSaltSync(10))

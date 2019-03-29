@@ -1,7 +1,7 @@
 const request = require("supertest")
 const app = require("../../app")
 const {sequelize} = require("../../models")
-const createEventsAndQuestions = require('../../seed')
+const {createEventsAndQuestions} = require('../../seed')
 
 jest.mock("jsonwebtoken")
 const jwt = require("jsonwebtoken")

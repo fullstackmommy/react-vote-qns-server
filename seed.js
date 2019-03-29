@@ -1,4 +1,8 @@
-const {Event, Question} = require('./models')
+const {Event, Question, User} = require('./models')
+
+const createUsers = async() => {
+    await User.create({username: "admin", firstName: "In", lastName: "Quisitive", password: "admin"})
+}
 
 const createEventsAndQuestions = async() => {
     await Event.create({
@@ -58,4 +62,7 @@ const createEventsAndQuestions = async() => {
 
 }
 
-module.exports = createEventsAndQuestions
+module.exports = {
+    createEventsAndQuestions,
+    createUsers
+}

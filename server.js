@@ -1,6 +1,6 @@
 const app = require('./app')
 const {sequelize} = require("./models")
-const createEventsAndQuestions = require('./seed')
+const {createEventsAndQuestions} = require('./seed')
 const port = process.env.PORT || 8080
 const eraseDatabaseOnSync = true
 
