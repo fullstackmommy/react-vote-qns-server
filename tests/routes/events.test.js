@@ -443,20 +443,12 @@ describe('Questions', () => {
     })
 
     describe('[PUT]', () => {
-        afterEach(() => {
-            jwt
-                .verify
-                .mockReset()
-        })
         test('Updates a question description based on question ID', () => {
-            jwt
-                .verify
-                .mockResolvedValueOnce({})
+
             const id = "SJADES2018"
             const qid = "2"
             return request(app)
                 .put(questionRoute(id, qid))
-                .set("Authorization", "Bearer my-token")
                 .send({description: "How did you prepare the specimens onboard?"})
                 .expect(202)
                 .then(res => {
@@ -468,14 +460,11 @@ describe('Questions', () => {
         })
 
         test('Updates a question - vote based on question ID', () => {
-            jwt
-                .verify
-                .mockResolvedValueOnce({})
+
             const id = "SJADES2018"
             const qid = "2"
             return request(app)
                 .put(questionRoute(id, qid))
-                .set("Authorization", "Bearer my-token")
                 .send({vote: 100})
                 .expect(202)
                 .then(res => {
@@ -488,14 +477,11 @@ describe('Questions', () => {
         })
 
         test('Fails to update a question: record not found', (done) => {
-            jwt
-                .verify
-                .mockResolvedValueOnce({})
+
             const id = "SJADES2018"
             const qid = "1000"
             return request(app)
                 .put(questionRoute(id, qid))
-                .set("Authorization", "Bearer my-token")
                 .send({description: "How did you prepare the specimens onboard?", vote: 100})
                 .expect(400, done)
         })

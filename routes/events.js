@@ -119,7 +119,9 @@ router
             })
 
             if (event) {
-                res.sendStatus(202)
+                res
+                    .status(202)
+                    .send({message: `Event ${req.params.id} has been deleted`})
             } else {
                 throw new Error('Event not found')
             }
@@ -198,7 +200,7 @@ router
         }
 
     })
-    .put(verifyToken, async(req, res) => {
+    .put(async(req, res) => {
         try {
             const question = await Question.findOne({
                 where: {
