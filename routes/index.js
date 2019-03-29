@@ -38,32 +38,6 @@ router
     })
 
 router
-    .route('/login')
-    .post(async(req, res) => {
-        try {
-            const {username, password} = req.body
-            const user = await User.findOne({username})
-
-            if (!user) {
-                throw new Error('You are not authorized!')
-            }
-
-            const match = await bcrypt.compareSync(password, user.password)
-            if (!match) {
-                throw new Error('You are not authorized!')
-            }
-
-            return res
-                .status(200)
-                .end('You are logged in')
-        } catch (err) {
-            res
-                .status(401)
-                .send(err.message)
-        }
-    })
-
-router
     .route('/token')
     .get(async(req, res) => {
         try {
