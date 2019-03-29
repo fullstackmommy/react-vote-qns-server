@@ -6,7 +6,7 @@ const {Event, Question, sequelize} = require("../models")
 
 verifyToken = async(req, res, next) => {
     if (!req.headers.authorization) 
-        return res.sendStatus(403)
+        return res.status(403).send({error: "Unauthorized access!"})
     try {
         const token = req
             .headers
@@ -19,7 +19,7 @@ verifyToken = async(req, res, next) => {
     } catch (err) {
         res
             .status(403)
-            .send(err.message)
+            .send({error: err.message})
     }
 }
 
