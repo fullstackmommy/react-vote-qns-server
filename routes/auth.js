@@ -43,7 +43,7 @@ router
         } catch (err) {
             res
                 .status(401)
-                .send(err.message)
+                .send({error: err.message})
         }
     })
 

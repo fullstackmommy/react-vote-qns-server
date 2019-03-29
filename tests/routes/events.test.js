@@ -27,11 +27,6 @@ afterAll(async() => {
 
 describe('Events', () => {
     describe('[GET]', () => {
-        afterEach(() => {
-            jwt
-                .verify
-                .mockReset()
-        })
         const verifyEvents = (res, expected) => {
             const events = res.body
             events.forEach((event, index) => {
@@ -44,31 +39,7 @@ describe('Events', () => {
             })
         }
 
-        test('Returns all events - deny access when no token is given', (done) => {
-            jwt
-                .verify
-                .mockRejectedValueOnce({})
-
-            return request(app)
-                .get(route())
-                .expect(403, done)
-        })
-
-        test('Returns all events - deny access when token is invalid', (done) => {
-            jwt
-                .verify
-                .mockRejectedValueOnce(new Error('Invalid token given'))
-
-            return request(app)
-                .get(route())
-                .set("Authorization", "Bearer invalid-token")
-                .expect(403, done)
-        })
-
         test('Returns all events', () => {
-            jwt
-                .verify
-                .mockResolvedValueOnce({})
             const expectedEvents = [
                 {
                     id: "SJADES2018",
@@ -122,16 +93,13 @@ describe('Events', () => {
 
             return request(app)
                 .get(route())
-                .set("Authorization", "Bearer my-token")
                 .expect("content-type", /json/)
                 .expect(200)
                 .expect(res => verifyEvents(res, expectedEvents))
         })
 
         test('Returns matching event based on event ID', () => {
-            jwt
-                .verify
-                .mockResolvedValueOnce({})
+
             const id = "SJADES2018"
             const expectedEvents = [
                 {
@@ -161,7 +129,6 @@ describe('Events', () => {
             ]
             return request(app)
                 .get(route(id))
-                .set("Authorization", "Bearer my-token")
                 .expect("content-type", /json/)
                 .expect(200)
                 .then(res => {
@@ -176,15 +143,9 @@ describe('Events', () => {
                 })
         })
         test('Returns matching event based on event ID - no record found', (done) => {
-            jwt
-                .verify
-                .mockResolvedValueOnce({})
             const id = "1000"
-
             return request(app)
                 .get(route(id))
-                .set("Authorization", "Bearer my-token")
-                .expect("content-type", /json/)
                 .expect(400, done)
         })
     })
@@ -194,6 +155,23 @@ describe('Events', () => {
             jwt
                 .verify
                 .mockReset()
+        })
+
+        test('Creates a new event - deny access when no token is given', (done) => {
+            return request(app)
+                .post(route())
+                .expect(403, done)
+        })
+
+        test('Creates a new event - deny access when token is invalid', (done) => {
+            jwt
+                .verify
+                .mockRejectedValueOnce(new Error('Invalid token given'))
+
+            return request(app)
+                .post(route())
+                .set("Authorization", "Bearer invalid-token")
+                .expect(403, done)
         })
         test('Fails to create an event if the event ID is already used', (done) => {
             jwt
@@ -440,17 +418,12 @@ describe('Questions', () => {
                 })
         })
 
-        test('Get the question based on question ID: no record found', () => {
+        test('Get the question based on question ID: no record found', (done) => {
             const id = "SJADES2018"
             const questionId = "100"
             return request(app)
                 .get(questionRoute(id, questionId))
-                .expect("content-type", /json/)
-                .expect(200)
-                .then(res => {
-                    const question = res.body
-                    expect(question).toBeNull()
-                })
+                .expect(400, done)
         })
     })
 

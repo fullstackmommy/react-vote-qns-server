@@ -25,7 +25,7 @@ verifyToken = async(req, res, next) => {
 
 router
     .route("/")
-    .get(verifyToken, async(req, res) => {
+    .get(async(req, res) => {
         const events = await Event.findAll({include: [Question]})
         res.json(events)
     })
@@ -59,13 +59,15 @@ router
                     .json(newEvent)
             }
         } catch (err) {
-            res.sendStatus(400)
+            res
+                .status(400)
+                .send({error: err.message})
         }
     })
 
 router
     .route("/:id")
-    .get(verifyToken, async(req, res) => {
+    .get(async(req, res) => {
         try {
             const events = await Event.findOne({
                 where: {
@@ -74,10 +76,12 @@ router
                 include: [Question]
             })
             if (!events) 
-                res.status(400).end
+                throw new Error('Event not found')
             res.json(events)
-        } catch (e) {
-            res.sendStatus(400)
+        } catch (err) {
+            res
+                .status(400)
+                .send({error: err.message})
         }
 
     })
@@ -117,10 +121,12 @@ router
             if (event) {
                 res.sendStatus(202)
             } else {
-                res.sendStatus(400)
+                throw new Error('Event not found')
             }
         } catch (e) {
-            res.sendStatus(400)
+            res
+                .status(400)
+                .send(e.message)
         }
     })
 
@@ -174,13 +180,23 @@ router
 router
     .route("/:id/questions/:qid")
     .get(async(req, res) => {
-        const questions = await Question.findOne({
-            where: {
-                id: req.params.qid
-            },
-            include: [Event]
-        })
-        res.json(questions)
+        try {
+            const questions = await Question.findOne({
+                where: {
+                    id: req.params.qid
+                },
+                include: [Event]
+            })
+
+            if (!questions) 
+                throw new Error('Question ID not found')
+            res.json(questions)
+        } catch (e) {
+            res
+                .status(400)
+                .send(e.message)
+        }
+
     })
     .put(verifyToken, async(req, res) => {
         try {
