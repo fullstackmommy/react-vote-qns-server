@@ -29,7 +29,7 @@ router
         const events = await Event.findAll({include: [Question]})
         res.json(events)
     })
-    .post(async(req, res) => {
+    .post(verifyToken, async(req, res) => {
         try {
             const foundEvent = await Event.findOne({
                 where: {
@@ -110,7 +110,7 @@ router
             res.sendStatus(400)
         }
     })
-    .delete(async(req, res) => {
+    .delete(verifyToken, async(req, res) => {
         try {
             const event = await Event.destroy({
                 where: {

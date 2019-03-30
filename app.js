@@ -12,7 +12,7 @@ app.use("/", require("./routes/index"));
 app.use("/", require("./routes/auth"));
 app.use("/api/v1/events", require("./routes/events"));
 
-//io.set('origins', '*:*');
+io.set('origins', '*:*');
 io.on('connection', socket => {
 
     console.log('connected ', numConnection)
