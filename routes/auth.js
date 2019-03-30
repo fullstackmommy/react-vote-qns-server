@@ -84,7 +84,7 @@ router
     })
 
 router
-    .route('/token')
+    .route('/authenticate')
     .get(async(req, res) => {
         try {
             const {username, password} = req.body
