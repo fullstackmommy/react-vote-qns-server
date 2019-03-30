@@ -4,7 +4,8 @@ module.exports = {
         password: "postgres",
         database: "questions-api",
         options: {
-            dialect: "postgres"
+            dialect: "postgres",
+            logging: false
         }
     },
     test: {
