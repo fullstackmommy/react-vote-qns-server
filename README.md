@@ -60,6 +60,7 @@ Library used:
 
 ### Break down into end to end tests
 
+```
 Events
 [GET]
 √ Returns all events
@@ -94,6 +95,7 @@ Questions
 
 App
 √ should return with status code 200
+```
 
 ## Contributing
 
