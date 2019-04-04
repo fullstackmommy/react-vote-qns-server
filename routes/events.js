@@ -1,6 +1,7 @@
 const express = require("express")
 const router = express.Router()
 const jwt = require("jsonwebtoken")
+
 const secret = "SUPER SECRET"
 const {Event, Question, sequelize} = require("../models")
 
@@ -171,7 +172,22 @@ router
                 res
                     .status(201)
                     .json(newQuestionWithEvent)
+
+                socket
+                    .broadcast
+                    .emit('NewQuestionAdded', newQuestionWithEvent)
             })
+            /*
+            io.on('NewQuestionAdded', socket => {
+                console.log("Broadcasting ... ")
+                socket.on('NewQuestionAdded', (data) => {
+                    console.log('Received ', data)
+                })
+                socket.emit('NewQuestionAdded', newQuestionWithEvent)
+                socket
+                    .broadcast
+                    .emit('NewQuestionAdded', newQuestionWithEvent)
+            }) */
         } catch (e) {
             res
                 .status(400)
@@ -235,4 +251,5 @@ router
             res.sendStatus(400)
         }
     })
+
 module.exports = router;

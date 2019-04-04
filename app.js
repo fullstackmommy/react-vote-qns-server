@@ -4,7 +4,10 @@ const app = express();
 const server = require('http').createServer(app);
 const io = require('socket.io')(server);
 let numConnection = 0
-
+// testing for socketIO
+app.set("socketio", io)
+const eventRoute = require("./routes/ioevents")(io, app)
+//
 app.use(cors())
 app.use(express.json());
 app.use(express.static('public'))
@@ -17,17 +20,17 @@ io.on('connection', socket => {
 
     console.log('connected ', numConnection)
     numConnection = numConnection + 1;
-    socket.emit('FromAPI', numConnection)
+    socket.emit('ConnectionCounter', numConnection)
     socket
         .broadcast
-        .emit('FromAPI', numConnection)
+        .emit('ConnectionCounter', numConnection)
 
     socket.on('disconnect', function () {
         console.log('disconnected ', numConnection)
         numConnection = numConnection - 1;
         socket
             .broadcast
-            .emit('FromAPI', numConnection)
+            .emit('ConnectionCounter', numConnection)
     });
 
     /*     console.log('User connected')

@@ -1,7 +1,7 @@
 const {Event, Question, User} = require('./models')
 
 const createUsers = async() => {
-    await User.create({username: "admin", firstName: "In", lastName: "Quisitive", password: "admin"})
+    await User.create({username: "test", firstName: "In", lastName: "Test", password: "test"})
 }
 
 const createEventsAndQuestions = async() => {

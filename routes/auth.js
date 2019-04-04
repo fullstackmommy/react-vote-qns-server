@@ -5,6 +5,25 @@ const jwt = require("jsonwebtoken")
 const {User} = require("../models")
 const secret = "SUPER SECRET"
 
+verifyToken = async(req, res, next) => {
+    if (!req.headers.authorization) 
+        return res.status(403).send({error: "Unauthorized access!"})
+    try {
+        const token = req
+            .headers
+            .authorization
+            .split('Bearer ')[1]
+
+        const payload = await jwt.verify(token, secret)
+        if (payload) 
+            return next()
+    } catch (err) {
+        res
+            .status(403)
+            .send({error: err.message})
+    }
+}
+
 router
     .route('/auth/signin')
     .post(async(req, res) => {
@@ -59,7 +78,7 @@ router
 
 router
     .route('/register')
-    .post(async(req, res) => {
+    .post(verifyToken, async(req, res) => {
         try {
             const foundUser = await User.findOne({
                 where: {
