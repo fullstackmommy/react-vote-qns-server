@@ -173,9 +173,10 @@ router
                     .status(201)
                     .json(newQuestionWithEvent)
 
+                /*
                 socket
                     .broadcast
-                    .emit('NewQuestionAdded', newQuestionWithEvent)
+                    .emit('NewQuestionAdded', newQuestionWithEvent)*/
             })
             /*
             io.on('NewQuestionAdded', socket => {

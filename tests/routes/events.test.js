@@ -462,15 +462,15 @@ describe('Questions', () => {
         test('Updates a question - vote based on question ID', () => {
 
             const id = "SJADES2018"
-            const qid = "2"
+            const qid = "3"
             return request(app)
                 .put(questionRoute(id, qid))
                 .send({vote: 100})
                 .expect(202)
                 .then(res => {
                     const question = res.body
-                    expect(question.id).toEqual(2)
-                    expect(question.description).toEqual("How did you prepare the specimens onboard?")
+                    expect(question.id).toEqual(3)
+                    expect(question.description).toEqual("Why the specimens don't turn mouldy over time?")
                     expect(question.vote).toEqual(100)
                     expect(question.event.name).toEqual("SJADES 2018 Scientific Talk")
                 })
