@@ -7,6 +7,7 @@
     "start": "cross-env NODE_ENV=production node server.js",
     "dev": "cross-env NODE_ENV=development nodemon server.js",
     "test:watch": "cross-env NODE_ENV=test jest --watch",
+    "temp": "exit 0",
     "test": "cross-env NODE_ENV=test jest"
   },
   "keywords": [],
