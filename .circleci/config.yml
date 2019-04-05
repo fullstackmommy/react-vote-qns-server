@@ -17,7 +17,7 @@ jobs:
             - ./node_modules
       - run: # run tests
           name: Run Test
-          command: npm run temp
+          command: npm test
   deploy-auto:
     docker:
       - image: buildpack-deps:trusty
