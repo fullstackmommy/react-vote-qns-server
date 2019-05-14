@@ -1,49 +1,52 @@
 const express = require("express");
-const cors = require('cors')
 const app = express();
-const server = require('http').createServer(app);
-const io = require('socket.io')(server);
-let numConnection = 0
+
+const cors = require("cors");
+const server = require("http").createServer(app);
+
+const socket = require("socket.io");
+const io = socket(server);
+let numConnection = 0;
 // testing for socketIO
-app.set("socketio", io)
-const eventRoute = require("./routes/ioevents")(io, app)
+app.set("socketio", io);
+//const eventRoute = require("./routes/ioevents")(io, app);
 //
-app.use(cors())
+app.use(cors());
 app.use(express.json());
-app.use(express.static('public'))
+app.use(express.static("public"));
 app.use("/", require("./routes/index"));
 app.use("/", require("./routes/auth"));
 app.use("/api/v1/events", require("./routes/events"));
 
-io.set('origins', '*:*');
-io.on('connection', socket => {
+io.set("origins", "*:*");
+io.on("connection", socket => {
+  numConnection = numConnection + 1;
+  console.log("connected ", socket.id);
 
-    console.log('connected ', numConnection)
-    numConnection = numConnection + 1;
-    socket.emit('ConnectionCounter', numConnection)
-    socket
-        .broadcast
-        .emit('ConnectionCounter', numConnection)
+  socket.on("newConnection", function() {
+    io.sockets.emit("newConnection", numConnection);
+  });
 
-    socket.on('disconnect', function () {
-        console.log('disconnected ', numConnection)
-        numConnection = numConnection - 1;
-        socket
-            .broadcast
-            .emit('ConnectionCounter', numConnection)
-    });
+  socket.on("typing", function() {
+    console.log("typing...");
+    socket.broadcast.emit("typing", numConnection);
+  });
 
-    /*     console.log('User connected')
-    socket.emit('FromAPI', 'test2')
-    socket
-        .broadcast
-        .emit('FromAPI', 'test')
-    socket.on('FromClient', (data) => {
-        console.log('Received ', data)
-    })
-    socket.on('disconnect', () => {
-        console.log('user disconnected')
-    }) */
-})
+  socket.on("addQuestion", function() {
+    console.log("Receiving new question...");
+    io.sockets.emit("addQuestion");
+  });
+
+  socket.on("addVote", function() {
+    console.log("Adding vote... ");
+    io.sockets.emit("addVote");
+  });
+
+  socket.on("disconnect", function() {
+    console.log("disconnected ", numConnection);
+    numConnection = numConnection - 1;
+    socket.broadcast.emit("ConnectionCounter", numConnection);
+  });
+});
 
 module.exports = server;
